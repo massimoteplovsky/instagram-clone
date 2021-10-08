@@ -1,9 +1,9 @@
-import React from "react";
-import { useLayoutStyles } from "../../styles";
-import SEO from "../shared/Seo";
-import Navbar from "../shared/Navbar";
+import React from 'react';
+import { useLayoutStyles } from '../../styles';
+import SEO from '../shared/Seo';
+import Navbar from './navbar/Navbar';
 
-function Layout({ children, title, marginTop = 60 }) {
+const Layout = ({ children, title, marginTop = 60 }) => {
   const classes = useLayoutStyles();
 
   return (
@@ -17,6 +17,6 @@ function Layout({ children, title, marginTop = 60 }) {
       </main>
     </section>
   );
-}
+};
 
 export default Layout;

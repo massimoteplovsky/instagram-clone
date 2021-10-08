@@ -1,10 +1,35 @@
-import React from "react";
-import { useUserCardStyles } from "../../styles";
+import React from 'react';
+import { Avatar, Typography } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import { useUserCardStyles } from '../../styles';
 
-function UserCard() {
-  useUserCardStyles();
+import { defaultUser } from '../../data';
 
-  return <div>UserCard</div>;
-}
+const UserCard = ({ user = defaultUser, avatarSize = 44 }) => {
+  const cx = useUserCardStyles({ avatarSize });
+  const { name, username, profile_image } = user;
+
+  return (
+    <div className={cx.wrapper}>
+      <Link to={`/${username}`}>
+        <Avatar src={profile_image} alt="User Avatar" className={cx.avatar} />
+      </Link>
+      <div className={cx.nameWrapper}>
+        <Link to={`/${username}`}>
+          <Typography variant="subtitle2" className={cx.typography}>
+            {username}
+          </Typography>
+        </Link>
+        <Typography
+          color="textSecondary"
+          variant="body2"
+          className={cx.typography}
+        >
+          {name}
+        </Typography>
+      </div>
+    </div>
+  );
+};
 
 export default UserCard;

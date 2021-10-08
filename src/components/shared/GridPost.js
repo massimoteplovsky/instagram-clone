@@ -1,10 +1,10 @@
-import React from "react";
-import { useGridPostStyles } from "../../styles";
+import React from 'react';
+import { useGridPostStyles } from '../../styles';
 
-function GridPost() {
+const GridPost = () => {
   useGridPostStyles();
 
   return <div>GridPost</div>;
-}
+};
 
 export default GridPost;

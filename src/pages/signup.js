@@ -1,20 +1,22 @@
-import React from "react";
-import { useSignUpPageStyles } from "../styles";
-import SEO from "../components/shared/Seo";
-import { Card, Typography, TextField, Button } from "@material-ui/core";
-import { LoginWithFacebook } from "./login";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { useSignUpPageStyles } from '../styles';
+import SEO from '../components/shared/Seo';
+import { Card, Typography, TextField, Button } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
-function SignUpPage() {
-  const classes = useSignUpPageStyles();
+// Components
+import LoginWithFacebook from '../components/shared/LoginWithFacebook';
+
+const SignUpPage = () => {
+  const cx = useSignUpPageStyles();
   return (
     <>
       <SEO title="Sign up" />
-      <section className={classes.section}>
+      <section className={cx.section}>
         <article>
-          <Card className={classes.card}>
-            <div className={classes.cardHeader} />
-            <Typography className={classes.cardHeaderSubHeader}>
+          <Card className={cx.card}>
+            <div className={cx.cardHeader} />
+            <Typography className={cx.cardHeaderSubHeader}>
               Sign up to see photos and videos from your friends.
             </Typography>
             <LoginWithFacebook
@@ -22,14 +24,14 @@ function SignUpPage() {
               iconColor="white"
               variant="contained"
             />
-            <div className={classes.orContainer}>
-              <div className={classes.orLine} />
+            <div className={cx.orContainer}>
+              <div className={cx.orLine} />
               <div>
                 <Typography variant="body2" color="textSecondary">
                   OR
                 </Typography>
               </div>
-              <div className={classes.orLine} />
+              <div className={cx.orLine} />
             </div>
             <form>
               <TextField
@@ -38,21 +40,21 @@ function SignUpPage() {
                 label="Email"
                 type="email"
                 margin="dense"
-                className={classes.textField}
+                className={cx.textField}
               />
               <TextField
                 fullWidth
                 variant="filled"
                 label="Full Name"
                 margin="dense"
-                className={classes.textField}
+                className={cx.textField}
               />
               <TextField
                 fullWidth
                 variant="filled"
                 label="Username"
                 margin="dense"
-                className={classes.textField}
+                className={cx.textField}
                 autoComplete="username"
               />
               <TextField
@@ -61,26 +63,26 @@ function SignUpPage() {
                 label="Password"
                 type="password"
                 margin="dense"
-                className={classes.textField}
+                className={cx.textField}
                 autoComplete="new-password"
               />
               <Button
                 variant="contained"
                 fullWidth
                 color="primary"
-                className={classes.button}
+                className={cx.button}
                 type="submit"
               >
                 Sign Up
               </Button>
             </form>
           </Card>
-          <Card className={classes.loginCard}>
+          <Card className={cx.loginCard}>
             <Typography align="right" variant="body2">
               Have an account?
             </Typography>
             <Link to="/accounts/login">
-              <Button color="primary" className={classes.loginButton}>
+              <Button color="primary" className={cx.loginButton}>
                 Log in
               </Button>
             </Link>
@@ -89,6 +91,6 @@ function SignUpPage() {
       </section>
     </>
   );
-}
+};
 
 export default SignUpPage;

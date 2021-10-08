@@ -1,10 +1,10 @@
-import React from "react";
-import { useProfilePictureStyles } from "../../styles";
+import React from 'react';
+import { useProfilePictureStyles } from '../../styles';
 
-function ProfilePicture() {
+const ProfilePicture = () => {
   useProfilePictureStyles();
 
   return <div>ProfilePicture</div>;
-}
+};
 
 export default ProfilePicture;

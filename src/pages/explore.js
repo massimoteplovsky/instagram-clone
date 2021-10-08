@@ -1,7 +1,10 @@
-import React from "react";
+import React from 'react';
 
-function ExplorePage() {
-  return <div>ExplorePage</div>;
-}
+// Components
+import Layout from '../components/shared/Layout';
+
+const ExplorePage = () => {
+  return <Layout>ExplorePage</Layout>;
+};
 
 export default ExplorePage;

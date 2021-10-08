@@ -1,10 +1,35 @@
-import React from "react";
-import { useFollowButtonStyles } from "../../styles";
+import React from 'react';
+import { Button } from '@material-ui/core';
+import { useFollowButtonStyles } from '../../styles';
 
-function FollowButton() {
-  useFollowButtonStyles();
+const FollowButton = ({ side = false }) => {
+  const cx = useFollowButtonStyles({ side });
+  const [isFollowing, setFollowing] = React.useState(false);
 
-  return <div>FollowButton</div>;
-}
+  const followButton = (
+    <Button
+      variant={side ? 'text' : 'contained'}
+      color="primary"
+      className={cx.button}
+      onClick={() => setFollowing(true)}
+      fullWidth
+    >
+      Follow
+    </Button>
+  );
+
+  const followingButton = (
+    <Button
+      variant={side ? 'text' : 'outlined'}
+      className={cx.button}
+      onClick={() => setFollowing(false)}
+      fullWidth
+    >
+      Following
+    </Button>
+  );
+
+  return isFollowing ? followingButton : followButton;
+};
 
 export default FollowButton;

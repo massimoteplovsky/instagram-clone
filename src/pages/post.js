@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-function PostPage() {
+const PostPage = () => {
   return <div>PostPage</div>;
-}
+};
 
 export default PostPage;

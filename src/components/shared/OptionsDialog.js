@@ -1,10 +1,10 @@
-import React from "react";
-import { useOptionsDialogStyles } from "../../styles";
+import React from 'react';
+import { useOptionsDialogStyles } from '../../styles';
 
-function OptionsDialog() {
+const OptionsDialog = () => {
   useOptionsDialogStyles();
 
   return <div>OptionsDialog</div>;
-}
+};
 
 export default OptionsDialog;
