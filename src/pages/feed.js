@@ -9,6 +9,7 @@ import FeedPost from '../components/feed/FeedPost';
 import FeedSideSuggestions from '../components/feed/FeedSideSuggestions';
 import UserCard from '../components/shared/UserCard';
 import LoadingScreen from '../components/shared/LoadingScreen';
+import FollowSuggestions from '../components/shared/FollowSuggestions';
 import { LoadingLargeIcon } from '../icons';
 
 const FeedPage = () => {
@@ -25,9 +26,14 @@ const FeedPage = () => {
     <Layout>
       <div className={cx.container}>
         <div>
-          {Array.from({ length: 5 }, () => getDefaultPost()).map((post) => {
-            return <FeedPost key={post.id} post={post} />;
-          })}
+          {Array.from({ length: 5 }, () => getDefaultPost()).map(
+            (post, index) => {
+              if (index === 2) {
+                return <FollowSuggestions key={index} />;
+              }
+              return <FeedPost key={post.id} post={post} />;
+            }
+          )}
         </div>
         <Hidden only="xs">
           <div className={cx.sidebarContainer}>

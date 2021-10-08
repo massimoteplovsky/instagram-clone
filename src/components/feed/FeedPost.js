@@ -15,18 +15,27 @@ import {
   SaveIcon,
   RemoveIcon,
 } from '../../icons';
+import OptionsDialog from '../shared/OptionsDialog';
 
 const FeedPost = ({ post }) => {
   const cx = useFeedPostStyles();
   const [showCaption, setShowCaption] = useState(false);
-  const { id, likes, caption, user, media, comments, created_at } = post;
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+
+  const { id, likes, caption, user, media, comments } = post;
 
   return (
     <>
+      {showOptionsDialog && (
+        <OptionsDialog onClose={() => setShowOptionsDialog(false)} />
+      )}
       <article className={cx.article}>
         <div className={cx.postHeader}>
           <UserCard user={user} />
-          <MoreIcon className={cx.moreIcon} />
+          <MoreIcon
+            className={cx.moreIcon}
+            onClick={() => setShowOptionsDialog(true)}
+          />
         </div>
         <div>
           <img src={media} alt="Post media" className={cx.image} />

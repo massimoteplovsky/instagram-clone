@@ -20,8 +20,6 @@ const Search = ({ history }) => {
     setResult(Array.from({ length: 3 }, () => getDefaultUser()));
   }, [query]);
 
-  console.log(result);
-
   return (
     <Hidden only="xs">
       <WhiteTooltip
