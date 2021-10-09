@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Hidden } from '@material-ui/core';
 import { useFeedPageStyles } from '../styles';
 import { getDefaultPost } from '../data';
 
 // Components
 import Layout from '../components/shared/Layout';
-import FeedPost from '../components/feed/FeedPost';
+// import FeedPost from '../components/feed/FeedPost';
 import FeedSideSuggestions from '../components/feed/FeedSideSuggestions';
 import UserCard from '../components/shared/UserCard';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import FollowSuggestions from '../components/shared/FollowSuggestions';
 import { LoadingLargeIcon } from '../icons';
+const FeedPost = lazy(() => import('../components/feed/FeedPost'));
 
 const FeedPage = () => {
   const cx = useFeedPageStyles();
@@ -31,7 +32,11 @@ const FeedPage = () => {
               if (index === 2) {
                 return <FollowSuggestions key={index} />;
               }
-              return <FeedPost key={post.id} post={post} />;
+              return (
+                <Suspense key={post.id} fallback={<>loading</>}>
+                  <FeedPost post={post} />
+                </Suspense>
+              );
             }
           )}
         </div>

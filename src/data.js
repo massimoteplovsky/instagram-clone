@@ -25,7 +25,8 @@ export const defaultPost = {
   likes: 10,
   caption: `<span class="">Do you know the 10 JavaScript concepts you need to learn React? 🤔⚛️👇<br>•<br>•<br>👉 Get the FREE cheatsheet to learn them now: bit.ly/10-js-tips 🔥</span>`,
   user: defaultUser,
-  media: 'https://warez-vislovo.ru/_nw/212/28366653.jpg',
+  media:
+    'https://images-platform.99static.com/qImBw9TeZGU0btfD27w8MaGVmzY=/373x0:1453x1080/500x500/top/smart/99designs-contests-attachments/97/97239/attachment_97239564',
   comments: [],
   created_at: '2020-02-28T03:08:14.522421+00:00',
 };
@@ -36,7 +37,8 @@ export const getDefaultPost = () => {
     likes: 10,
     caption: `<span class="">Do you know the 10 JavaScript concepts you need to learn React? 🤔⚛️👇<br>•<br>•<br>👉 Get the FREE cheatsheet to learn them now: bit.ly/10-js-tips 🔥</span>`,
     user: defaultUser,
-    media: 'https://warez-vislovo.ru/_nw/212/28366653.jpg',
+    media:
+      'https://images-platform.99static.com/qImBw9TeZGU0btfD27w8MaGVmzY=/373x0:1453x1080/500x500/top/smart/99designs-contests-attachments/97/97239/attachment_97239564',
     comments: [],
     created_at: '2020-02-28T03:08:14.522421+00:00',
   };

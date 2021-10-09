@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { Switch, Route, useHistory } from 'react-router-dom';
 import { Path } from './consts';
 
 // Pages
@@ -12,10 +12,25 @@ import LoginPage from './pages/login';
 import SignUpPage from './pages/signup';
 import NotFoundPage from './pages/not-found';
 
+// Components
+import PostModal from './components/post/PostModal';
+
 const App = () => {
+  const history = useHistory();
+  const prevLocation = useRef(history.location);
+  const modal = history.location.state?.modal;
+
+  useEffect(() => {
+    if (history.action !== 'POP' && !modal) {
+      prevLocation.current = history.location;
+    }
+  }, [modal, history.location, history.action]);
+
+  const isModalOpen = modal && prevLocation.current !== history.location;
+
   return (
-    <Router>
-      <Switch>
+    <>
+      <Switch location={isModalOpen ? prevLocation.current : history.location}>
         <Route exact path={Path.DASHBOARD} component={FeedPage} />
         <Route path={Path.EXPLORE} component={ExplorePage} />
         <Route exact path={Path.ACCOUNT()} component={ProfilePage} />
@@ -25,7 +40,8 @@ const App = () => {
         <Route path={Path.SIGNUP} component={SignUpPage} />
         <Route path={Path.DEFAULT} component={NotFoundPage} />
       </Switch>
-    </Router>
+      {isModalOpen && <Route exact path={Path.POST()} component={PostModal} />}
+    </>
   );
 };
 

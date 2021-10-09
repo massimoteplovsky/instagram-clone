@@ -1,7 +1,20 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+
+// Components
+import Layout from '../components/shared/Layout';
+import Post from '../components/post/Post';
+import MorePostFromUser from '../components/post/MorePostsFromUser';
 
 const PostPage = () => {
-  return <div>PostPage</div>;
+  const { postId } = useParams();
+
+  return (
+    <Layout>
+      <Post id={postId} />
+      <MorePostFromUser />
+    </Layout>
+  );
 };
 
 export default PostPage;
