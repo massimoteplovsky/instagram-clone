@@ -22,12 +22,19 @@ import {
   RemoveIcon,
 } from '../../icons';
 import OptionsDialog from '../shared/OptionsDialog';
+import PostSkeleton from './PostSkeleton';
 
 const Post = ({ postId }) => {
   const cx = usePostStyles();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { id, likes, caption, user, media, comments } = defaultPost;
+
+  setTimeout(() => setLoading(false), 3000);
+  if (loading) {
+    return <PostSkeleton />;
+  }
 
   return (
     <div className={cx.postContainer}>
