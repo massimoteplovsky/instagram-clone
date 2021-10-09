@@ -11,6 +11,7 @@ import UserCard from '../components/shared/UserCard';
 import LoadingScreen from '../components/shared/LoadingScreen';
 import FollowSuggestions from '../components/shared/FollowSuggestions';
 import { LoadingLargeIcon } from '../icons';
+import FeedPostSkeleton from '../components/feed/FeedPostSkeleton';
 const FeedPost = lazy(() => import('../components/feed/FeedPost'));
 
 const FeedPage = () => {
@@ -33,7 +34,7 @@ const FeedPage = () => {
                 return <FollowSuggestions key={index} />;
               }
               return (
-                <Suspense key={post.id} fallback={<>loading</>}>
+                <Suspense key={post.id} fallback={<FeedPostSkeleton />}>
                   <FeedPost post={post} />
                 </Suspense>
               );
