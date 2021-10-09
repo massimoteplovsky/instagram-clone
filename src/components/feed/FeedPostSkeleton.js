@@ -1,10 +1,10 @@
-import React from "react";
-import { useFeedPostSkeletonStyles } from "../../styles";
+import React from 'react';
+import { useFeedPostSkeletonStyles } from '../../styles';
 
-function FeedPostSkeleton() {
+const FeedPostSkeleton = () => {
   useFeedPostSkeletonStyles();
 
   return <div>FeedPostSkeleton</div>;
-}
+};
 
 export default FeedPostSkeleton;

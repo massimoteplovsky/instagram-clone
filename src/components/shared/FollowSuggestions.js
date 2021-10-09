@@ -10,19 +10,24 @@ import { getDefaultUser } from '../../data';
 import { LoadingLargeIcon } from '../../icons';
 import FollowSuggestionItem from './FollowSuggestionItem';
 
-const FollowSuggestions = () => {
+const FollowSuggestions = ({ headless = false }) => {
   const cx = useFollowSuggestionsStyles();
   const loading = false;
 
   return (
-    <div className={cx.container} style={{ marginTop: '-30px' }}>
-      <Typography
-        className={cx.typography}
-        color="textSecondary"
-        variant="subtitle2"
-      >
-        Suggestions for you
-      </Typography>
+    <div
+      className={cx.container}
+      style={{ marginTop: !headless ? '-30px' : 0 }}
+    >
+      {!headless && (
+        <Typography
+          className={cx.typography}
+          color="textSecondary"
+          variant="subtitle2"
+        >
+          Suggestions for you
+        </Typography>
+      )}
       {loading ? (
         <LoadingLargeIcon />
       ) : (
