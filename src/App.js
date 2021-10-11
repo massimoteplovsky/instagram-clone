@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import { Path } from './consts';
+import { AuthContext } from './auth';
 
 // Pages
 import FeedPage from './pages/feed';
@@ -17,8 +18,11 @@ import PostModal from './components/post/PostModal';
 
 const App = () => {
   const history = useHistory();
+  const { authState } = useContext(AuthContext);
   const prevLocation = useRef(history.location);
   const modal = history.location.state?.modal;
+
+  console.log(authState);
 
   useEffect(() => {
     if (history.action !== 'POP' && !modal) {
