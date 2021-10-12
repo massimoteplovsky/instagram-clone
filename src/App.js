@@ -21,8 +21,7 @@ const App = () => {
   const { authState } = useContext(AuthContext);
   const prevLocation = useRef(history.location);
   const modal = history.location.state?.modal;
-
-  console.log(authState);
+  const isAuth = authState.status === 'in';
 
   useEffect(() => {
     if (history.action !== 'POP' && !modal) {

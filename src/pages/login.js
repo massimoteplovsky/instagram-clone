@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import { Path } from '../consts';
 
 // Components
 import SEO from '../components/shared/Seo';
@@ -70,7 +71,7 @@ const LoginPage = () => {
             <Typography align="right" variant="body2">
               Don't have an account?
             </Typography>
-            <Link to="/accounts/emailsignup">
+            <Link to={Path.SIGNUP}>
               <Button color="primary" className={cx.signUpButton}>
                 Sign up
               </Button>
