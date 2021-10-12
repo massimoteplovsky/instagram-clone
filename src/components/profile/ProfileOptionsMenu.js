@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,15 +7,24 @@ import {
   Button,
   Divider,
 } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
 import { useProfilePageStyles } from '../../styles';
+import { AuthContext } from '../../auth';
+import { Path } from '../../consts';
 
 const ProfileOptionsMenu = ({ handleCloseMenu }) => {
   const cx = useProfilePageStyles();
+  const history = useHistory();
+  const { signOut } = useContext(AuthContext);
   const [showLogOutMessage, setLogOutMessage] = useState(false);
 
-  function handleLogOutClick() {
+  const handleLogOutClick = () => {
     setLogOutMessage(true);
-  }
+    setTimeout(() => {
+      signOut();
+      history.push(Path.LOGIN);
+    }, 2000);
+  };
 
   return (
     <Dialog

@@ -13,7 +13,7 @@ export const AuthContext = React.createContext();
 firebase.initializeApp({
   apiKey: 'AIzaSyCTJFoRvEvE2L982rLWaoVN43hQT0BaWtE',
   authDomain: 'instagram-react1.firebaseapp.com',
-  databaseURL: 'https://instagram-react1.firebaseio.com',
+  databaseURL: 'https://instagram-react1-default-rtdb.firebaseio.com/',
   projectId: 'instagram-react1',
   storageBucket: 'instagram-react1.appspot.com',
   messagingSenderId: '963766776560',

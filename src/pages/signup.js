@@ -1,36 +1,77 @@
 import React, { useContext, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useApolloClient } from '@apollo/react-hooks';
+import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
 import { useSignUpPageStyles } from '../styles';
-import SEO from '../components/shared/Seo';
-import { Card, Typography, TextField, Button } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import {
+  Card,
+  Typography,
+  TextField,
+  Button,
+  InputAdornment,
+} from '@material-ui/core';
+import { HighlightOff, CheckCircleOutline } from '@material-ui/icons';
+
 import { AuthContext } from '../auth';
 import { Path } from '../consts';
+import isEmail from 'validator/lib/isEmail';
+import { CHECK_IF_USERNAME_TAKEN } from '../graphql/queries';
 
 // Components
 import LoginWithFacebook from '../components/shared/LoginWithFacebook';
+import SEO from '../components/shared/Seo';
 
 const SignUpPage = () => {
   const cx = useSignUpPageStyles();
+  const client = useApolloClient();
+  const [formError, setFormError] = useState(null);
   const { signUpWithEmailAndPassword } = useContext(AuthContext);
   const history = useHistory();
-  const [formData, setFormData] = useState({
-    email: '',
-    name: '',
-    username: '',
-    password: '',
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting, touchedFields },
+  } = useForm({ mode: 'onBlur' });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(formData);
-    await signUpWithEmailAndPassword(formData);
-    history.push(Path.DASHBOARD);
+  const errorIcon = (
+    <InputAdornment>
+      <HighlightOff style={{ color: 'red', height: 30, width: 30 }} />
+    </InputAdornment>
+  );
+
+  const validIcon = (
+    <InputAdornment>
+      <CheckCircleOutline style={{ color: '#ccc', height: 30, width: 30 }} />
+    </InputAdornment>
+  );
+
+  const onSubmit = async (formData) => {
+    try {
+      setFormError(null);
+      await signUpWithEmailAndPassword(formData);
+      history.push(Path.DASHBOARD);
+    } catch (error) {
+      handleErrors(error);
+    }
   };
 
-  const handleChangeFormData = ({ target }) => {
-    const { name, value } = target;
-    setFormData((formData) => ({ ...formData, [name]: value }));
+  const handleErrors = (error) => {
+    if (error.message.includes('users_username_key')) {
+      return setFormError('Username is already taken');
+    }
+
+    setFormError(error.message);
+  };
+
+  const validateUsername = async (username) => {
+    const variables = { username };
+    const { data } = await client.query({
+      query: CHECK_IF_USERNAME_TAKEN,
+      variables,
+    });
+
+    return data.users.length === 0;
   };
 
   return (
@@ -57,7 +98,8 @@ const SignUpPage = () => {
               </div>
               <div className={cx.orLine} />
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <FormError error={formError} />
               <TextField
                 fullWidth
                 variant="filled"
@@ -65,7 +107,15 @@ const SignUpPage = () => {
                 type="email"
                 margin="dense"
                 name="email"
-                onChange={handleChangeFormData}
+                {...register('email', {
+                  required: true,
+                  validate: (value) => isEmail(value),
+                })}
+                InputProps={{
+                  endAdornment: errors.email
+                    ? errorIcon
+                    : touchedFields.email && validIcon,
+                }}
                 className={cx.textField}
               />
               <TextField
@@ -74,7 +124,16 @@ const SignUpPage = () => {
                 label="Full Name"
                 margin="dense"
                 name="name"
-                onChange={handleChangeFormData}
+                {...register('name', {
+                  required: true,
+                  minLength: 5,
+                  maxLength: 20,
+                })}
+                InputProps={{
+                  endAdornment: errors.name
+                    ? errorIcon
+                    : touchedFields.name && validIcon,
+                }}
                 className={cx.textField}
               />
               <TextField
@@ -83,9 +142,19 @@ const SignUpPage = () => {
                 label="Username"
                 margin="dense"
                 name="username"
-                onChange={handleChangeFormData}
+                {...register('username', {
+                  required: true,
+                  minLength: 5,
+                  maxLength: 20,
+                  pattern: /^[a-zA-Z0-9_.]*$/,
+                  validate: async (value) => validateUsername(value),
+                })}
+                InputProps={{
+                  endAdornment: errors.username
+                    ? errorIcon
+                    : touchedFields.username && validIcon,
+                }}
                 className={cx.textField}
-                autoComplete="username"
               />
               <TextField
                 fullWidth
@@ -94,11 +163,19 @@ const SignUpPage = () => {
                 type="password"
                 margin="dense"
                 name="password"
-                onChange={handleChangeFormData}
+                {...register('password', {
+                  required: true,
+                  minLength: 6,
+                })}
+                InputProps={{
+                  endAdornment: errors.password
+                    ? errorIcon
+                    : touchedFields.password && validIcon,
+                }}
                 className={cx.textField}
-                autoComplete="new-password"
               />
               <Button
+                disabled={!isValid || isSubmitting}
                 variant="contained"
                 fullWidth
                 color="primary"
@@ -113,7 +190,7 @@ const SignUpPage = () => {
             <Typography align="right" variant="body2">
               Have an account?
             </Typography>
-            <Link to="/accounts/login">
+            <Link to={Path.LOGIN}>
               <Button color="primary" className={cx.loginButton}>
                 Log in
               </Button>
@@ -122,6 +199,21 @@ const SignUpPage = () => {
         </article>
       </section>
     </>
+  );
+};
+
+export const FormError = ({ error }) => {
+  if (!error) return null;
+
+  return (
+    <Typography
+      align="center"
+      gutterBottom
+      variant="body2"
+      style={{ color: 'red' }}
+    >
+      {error}
+    </Typography>
   );
 };
 
