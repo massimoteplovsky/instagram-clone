@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useApolloClient, useLazyQuery } from '@apollo/react-hooks';
 import { Grid, Hidden, InputBase, Avatar, Typography } from '@material-ui/core';
 import { useNavbarStyles, WhiteTooltip } from '../../../styles';
-import { getDefaultUser } from '../../../data';
 import { Path } from '../../../consts';
+import { SEARCH_USERS } from '../../../graphql/queries';
 
 // Components
 import { LoadingIcon } from '../../../icons';
 
 const Search = ({ history }) => {
   const cx = useNavbarStyles();
+  const [searchUsers, { data }] = useLazyQuery(SEARCH_USERS);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState([]);
@@ -17,8 +19,16 @@ const Search = ({ history }) => {
     if (!query) {
       return setResult([]);
     }
-    setResult(Array.from({ length: 3 }, () => getDefaultUser()));
-  }, [query]);
+
+    const variables = { query };
+    setLoading(true);
+    searchUsers({ variables });
+
+    if (data) {
+      setResult(data.users);
+      setLoading(false);
+    }
+  }, [query, data, searchUsers]);
 
   return (
     <Hidden only="xs">

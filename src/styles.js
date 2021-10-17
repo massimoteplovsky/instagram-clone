@@ -327,7 +327,16 @@ export const useNavbarStyles = makeStyles((theme) => ({
     backgroundRepeat: 'no-repeat',
     backgroundPosition: '-385px -126px',
     height: 18,
-    width: 18,
+    width: 20,
+    margin: '0 5px',
+    display: 'block',
+  },
+  comments: {
+    backgroundImage: `url(${IconSheet})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '-383px -167px',
+    height: 18,
+    width: 20,
     margin: '0 5px',
     display: 'block',
   },
@@ -1710,6 +1719,57 @@ export const useMorePostsFromUserStyles = makeStyles((theme) => ({
     color: '#262626',
     '&:hover': {
       textDecoration: 'none',
+    },
+  },
+}));
+
+export const useAddPostDialogStyles = makeStyles((theme) => ({
+  appBar: {
+    position: 'relative',
+    background: '#fff !important',
+    color: 'black !important',
+    display: 'flex',
+    justifyContent: 'space-between',
+    height: '54px !important',
+  },
+  toolbar: {
+    minHeight: '54px !important',
+  },
+  title: {
+    flex: 1,
+    fontWeight: 600,
+  },
+  paper: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+  editor: {
+    flex: 1,
+  },
+  avatarLarge: {
+    width: theme.spacing(7),
+    height: theme.spacing(7),
+  },
+  input: {
+    padding: '10px !important',
+    fontSize: '14px !important',
+  },
+  root: {
+    border: '1px solid #e6e6e6',
+    marginTop: '10px !important',
+  },
+  underline: {
+    '&::before': {
+      border: 'none !important',
+    },
+    '&::after': {
+      border: 'none !important',
+    },
+    '&:hover&:before': {
+      border: 'none !important',
     },
   },
 }));

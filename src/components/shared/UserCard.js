@@ -5,7 +5,7 @@ import { useUserCardStyles } from '../../styles';
 
 import { defaultUser } from '../../data';
 
-const UserCard = ({ user = defaultUser, avatarSize = 44 }) => {
+const UserCard = ({ user = defaultUser, avatarSize = 44, location }) => {
   const cx = useUserCardStyles({ avatarSize });
   const { name, username, profile_image } = user;
 
@@ -25,7 +25,7 @@ const UserCard = ({ user = defaultUser, avatarSize = 44 }) => {
           variant="body2"
           className={cx.typography}
         >
-          {name}
+          {location || name}
         </Typography>
       </div>
     </div>

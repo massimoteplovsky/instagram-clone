@@ -4,15 +4,15 @@ import SEO from '../shared/Seo';
 import Navbar from './navbar/Navbar';
 
 const Layout = ({ children, title, marginTop = 60 }) => {
-  const classes = useLayoutStyles();
+  const cx = useLayoutStyles();
 
   return (
-    <section className={classes.section}>
+    <section className={cx.section}>
       <SEO title={title} />
       <Navbar />
-      <main className={classes.main} style={{ marginTop }}>
-        <section className={classes.childrenWrapper}>
-          <div className={classes.children}>{children}</div>
+      <main className={cx.main} style={{ marginTop }}>
+        <section className={cx.childrenWrapper}>
+          <div className={cx.children}>{children}</div>
         </section>
       </main>
     </section>

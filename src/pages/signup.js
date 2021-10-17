@@ -12,8 +12,7 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { HighlightOff, CheckCircleOutline } from '@material-ui/icons';
-
-import { AuthContext } from '../auth';
+import { AuthContext } from '../context';
 import { Path } from '../consts';
 import isEmail from 'validator/lib/isEmail';
 import { CHECK_IF_USERNAME_TAKEN } from '../graphql/queries';
@@ -21,12 +20,15 @@ import { CHECK_IF_USERNAME_TAKEN } from '../graphql/queries';
 // Components
 import LoginWithFacebook from '../components/shared/LoginWithFacebook';
 import SEO from '../components/shared/Seo';
+import FormError from '../components/shared/FormError';
 
 const SignUpPage = () => {
   const cx = useSignUpPageStyles();
   const client = useApolloClient();
   const [formError, setFormError] = useState(null);
-  const { signUpWithEmailAndPassword } = useContext(AuthContext);
+  const { signUpWithEmailAndPassword, signInWithFacebook } = useContext(
+    AuthContext
+  );
   const history = useHistory();
   const {
     register,
@@ -74,6 +76,14 @@ const SignUpPage = () => {
     return data.users.length === 0;
   };
 
+  const handleSigninWithFacebook = async () => {
+    try {
+      await signInWithFacebook();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <SEO title="Sign up" />
@@ -88,6 +98,7 @@ const SignUpPage = () => {
               color="primary"
               iconColor="white"
               variant="contained"
+              onLogin={handleSigninWithFacebook}
             />
             <div className={cx.orContainer}>
               <div className={cx.orLine} />
@@ -199,21 +210,6 @@ const SignUpPage = () => {
         </article>
       </section>
     </>
-  );
-};
-
-export const FormError = ({ error }) => {
-  if (!error) return null;
-
-  return (
-    <Typography
-      align="center"
-      gutterBottom
-      variant="body2"
-      style={{ color: 'red' }}
-    >
-      {error}
-    </Typography>
   );
 };
 

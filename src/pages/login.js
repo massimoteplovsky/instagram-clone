@@ -1,22 +1,64 @@
-import React from 'react';
-import { useLoginPageStyles } from '../styles';
-
+import React, { useState, useContext } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { useApolloClient } from '@apollo/react-hooks';
 import {
   Card,
   CardHeader,
   TextField,
   Button,
   Typography,
+  InputAdornment,
 } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import isEmail from 'validator/lib/isEmail';
+import { useLoginPageStyles } from '../styles';
 import { Path } from '../consts';
+import { AuthContext } from '../context';
+import { GET_USER_EMAIL } from '../graphql/queries';
 
 // Components
 import SEO from '../components/shared/Seo';
 import LoginWithFacebook from '../components/shared/LoginWithFacebook';
+import FormError from '../components/shared/FormError';
 
 const LoginPage = () => {
   const cx = useLoginPageStyles();
+  const { loginWithEmailAndPassword } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { isValid, isSubmitting },
+  } = useForm({ mode: 'onBlur' });
+  const [formError, setFormError] = useState(null);
+  const history = useHistory();
+  const client = useApolloClient();
+  const hasPassword = !!watch('password', false);
+
+  const onSubmit = async ({ enter, password }) => {
+    try {
+      if (!isEmail(enter)) {
+        const variables = { input: enter };
+        const { data } = await client.query({
+          query: GET_USER_EMAIL,
+          variables,
+        });
+
+        enter = data.users[0]?.email || 'www.dummyemail@mail.ru';
+      }
+
+      await loginWithEmailAndPassword(enter, password);
+      setFormError(null);
+      history.push(Path.DASHBOARD);
+    } catch (error) {
+      setFormError(error.message);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <>
@@ -25,14 +67,18 @@ const LoginPage = () => {
         <article>
           <Card className={cx.card}>
             <CardHeader className={cx.cardHeader} />
-            <form>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <FormError error={formError} />
               <TextField
                 fullWidth
                 variant="filled"
-                label="Username"
+                label="Username, Phone Number, Email"
                 margin="dense"
                 className={cx.textField}
-                autoComplete="username"
+                {...register('enter', {
+                  required: true,
+                  minLength: 5,
+                })}
               />
               <TextField
                 fullWidth
@@ -40,10 +86,23 @@ const LoginPage = () => {
                 label="Password"
                 margin="dense"
                 className={cx.textField}
-                autoComplete="current-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
+                {...register('password', {
+                  required: true,
+                  minLength: 6,
+                })}
+                InputProps={{
+                  endAdornment: hasPassword && (
+                    <InputAdornment>
+                      <Button onClick={togglePasswordVisibility}>
+                        {showPassword ? 'Hide' : 'Show'}
+                      </Button>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Button
+                disabled={!isValid || isSubmitting}
                 variant="contained"
                 fullWidth
                 color="primary"

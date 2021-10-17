@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { usePostStyles } from '../../styles';
 import {
@@ -7,11 +7,22 @@ import {
   Hidden,
   TextField,
   Divider,
+  Avatar,
 } from '@material-ui/core';
-import { defaultPost } from '../../data';
+import { useMutation, useSubscription } from '@apollo/react-hooks';
+import { GET_POST } from '../../graphql/subscriptions';
+import { UserContext } from '../../context';
+import {
+  LIKE_POST,
+  UNLIKE_POST,
+  SAVE_POST,
+  UNSAVE_POST,
+  CREATE_COMMENT,
+} from '../../graphql/mutations';
+import { Path } from '../../consts';
+import { formatDateToNowShort } from '../../utils/formatDate';
 
 // Components
-import UserCard from '../shared/UserCard';
 import {
   MoreIcon,
   CommentIcon,
@@ -23,79 +34,81 @@ import {
 } from '../../icons';
 import OptionsDialog from '../shared/OptionsDialog';
 import PostSkeleton from './PostSkeleton';
+import UserCard from '../shared/UserCard';
 
 const Post = ({ postId }) => {
   const cx = usePostStyles();
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { data, loading } = useSubscription(GET_POST, {
+    variables: { postId },
+  });
 
-  const { id, likes, caption, user, media, comments } = defaultPost;
-
-  setTimeout(() => setLoading(false), 3000);
   if (loading) {
     return <PostSkeleton />;
   }
+
+  const {
+    id,
+    likes,
+    saved_posts,
+    likes_aggregate: {
+      aggregate: { count: likesCount },
+    },
+    caption,
+    user,
+    image,
+    comments,
+    created_at,
+    location,
+  } = data.posts_by_pk;
 
   return (
     <div className={cx.postContainer}>
       <article className={cx.article}>
         <div className={cx.postHeader}>
-          <UserCard user={user} avatarSize={32} />
+          <UserCard user={user} location={location} avatarSize={32} />
           <MoreIcon
             className={cx.moreIcon}
             onClick={() => setShowOptionsDialog(true)}
           />
         </div>
         <div className={cx.postImage}>
-          <img src={media} alt="Post media" className={cx.image} />
+          <img src={image} alt="Post media" className={cx.image} />
         </div>
         <div className={cx.postButtonsWrapper}>
           <div className={cx.postButtons}>
-            <LikeButton />
-            <Link to={`/p/${id}`}>
+            <LikeButton likes={likes} postId={id} authorId={user.id} />
+            <Link to={Path.POST(id)}>
               <CommentIcon />
             </Link>
-            <ShareIcon />
-            <SaveButton />
+            <SaveButton savedPosts={saved_posts} postId={postId} />
           </div>
           <Typography className={cx.likes} variant="subtitle2">
-            <span>{likes === 1 ? '1 like' : `${likes} likes`}</span>
+            <span>{likesCount === 1 ? '1 like' : `${likesCount} likes`}</span>
           </Typography>
-          <div className={cx.postCaptionContainer}>
-            <Typography
-              className={cx.postCaption}
-              variant="body2"
-              component="span"
-              dangerouslySetInnerHTML={{ __html: caption }}
+          <div
+            style={{
+              overflowY: 'scroll',
+              padding: '16px 12px',
+              height: '100%',
+            }}
+          >
+            <AuthorCaption
+              user={user}
+              createdAt={created_at}
+              caption={caption}
             />
-            {comments.length > 0 && (
-              <>
-                {comments.map(({ id, user, content }) => (
-                  <div key={id}>
-                    <Link to={`/${user.username}`}>
-                      <Typography
-                        className={cx.commentUsername}
-                        variant="subtitle2"
-                        component="span"
-                      >
-                        {user.username}
-                      </Typography>
-                      <Typography variant="body2" component="span">
-                        {content}
-                      </Typography>
-                    </Link>
-                  </div>
-                ))}
-              </>
-            )}
+            {comments.map((comment) => (
+              <UserComment key={comment.id} comment={comment} />
+            ))}
           </div>
           <Typography className={cx.datePosted} color="textSecondary">
-            5 days ago
+            {formatDateToNowShort(created_at)}
           </Typography>
           <Hidden only="xs">
             <div className={cx.comment}>
               <Divider />
-              <CommentInput />
+              <CommentInput postId={postId} profileId={user.id} />
             </div>
           </Hidden>
         </div>
@@ -107,31 +120,181 @@ const Post = ({ postId }) => {
   );
 };
 
-const LikeButton = () => {
+const AuthorCaption = ({ user, createdAt, caption }) => {
   const cx = usePostStyles();
-  const [isLiked, setIsLiked] = useState(false);
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <Avatar
+        src={user.profile_image}
+        alt="User avatar"
+        style={{ marginRight: 14, width: 32, height: 32 }}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column ' }}>
+        <Link to={Path.ACCOUNT(user.username)}>
+          <Typography
+            variant="subtitle2"
+            component="span"
+            className={cx.username}
+          >
+            {user.username}
+          </Typography>{' '}
+          <Typography
+            variant="body2"
+            component="span"
+            className={cx.postCaption}
+            style={{ paddingLeft: 0 }}
+            dangerouslySetInnerHTML={{ __html: caption }}
+          />
+        </Link>
+        <Typography
+          style={{ marginTop: 16, marginBottom: 4, display: 'inline-block' }}
+          color="textSecondary"
+          variant="caption"
+        >
+          {formatDateToNowShort(createdAt)}
+        </Typography>
+      </div>
+    </div>
+  );
+};
+
+const UserComment = ({ comment }) => {
+  const cx = usePostStyles();
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <Avatar
+        src={comment.users.profile_image}
+        alt="User avatar"
+        style={{ marginRight: 14, width: 32, height: 32 }}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column ' }}>
+        <Link to={Path.ACCOUNT(comment.users.username)}>
+          <Typography
+            variant="subtitle2"
+            component="span"
+            className={cx.username}
+          >
+            {comment.users.username}
+          </Typography>{' '}
+          <Typography
+            variant="body2"
+            component="span"
+            className={cx.postCaption}
+            style={{ paddingLeft: 0 }}
+          >
+            {comment.content}
+          </Typography>
+        </Link>
+        <Typography
+          style={{ marginTop: 16, marginBottom: 4, display: 'inline-block' }}
+          color="textSecondary"
+          variant="caption"
+        >
+          {formatDateToNowShort(comment.created_at)}
+        </Typography>
+      </div>
+    </div>
+  );
+};
+
+const LikeButton = ({ likes, postId, authorId }) => {
+  const cx = usePostStyles();
+  const { currentUser } = useContext(UserContext);
+  const isAlreadyLiked = likes.some(
+    ({ user_id }) => user_id === currentUser.id
+  );
+  const [isLiked, setIsLiked] = useState(isAlreadyLiked);
+  const [likePost] = useMutation(LIKE_POST);
+  const [unlikePost] = useMutation(UNLIKE_POST);
+  const variables = {
+    postId,
+    userId: currentUser.id,
+    profileId: authorId,
+  };
+
+  const handleLikePost = () => {
+    setIsLiked(true);
+    likePost({ variables });
+  };
+
+  const handleUnlikePost = () => {
+    setIsLiked(false);
+    unlikePost({ variables });
+  };
 
   return isLiked ? (
-    <UnlikeIcon className={cx.liked} onClick={() => setIsLiked(false)} />
+    <UnlikeIcon
+      style={{ cursor: 'pointer' }}
+      className={cx.liked}
+      onClick={handleUnlikePost}
+    />
   ) : (
-    <LikeIcon className={cx.like} onClick={() => setIsLiked(true)} />
+    <LikeIcon
+      style={{ cursor: 'pointer' }}
+      className={cx.like}
+      onClick={handleLikePost}
+    />
   );
 };
 
-const SaveButton = () => {
+const SaveButton = ({ savedPosts, postId }) => {
   const cx = usePostStyles();
-  const [isSaved, setIsSaved] = useState(false);
+  const { currentUser } = useContext(UserContext);
+  const isAlreadySaved = savedPosts.some(
+    ({ user_id }) => user_id === currentUser.id
+  );
+  const [isSaved, setIsSaved] = useState(isAlreadySaved);
+  const [savePost] = useMutation(SAVE_POST);
+  const [unsavePost] = useMutation(UNSAVE_POST);
+  const variables = {
+    postId,
+    userId: currentUser.id,
+  };
+
+  const handleSavePost = () => {
+    setIsSaved(true);
+    savePost({ variables });
+  };
+
+  const handleUnsavePost = () => {
+    setIsSaved(false);
+    unsavePost({ variables });
+  };
 
   return isSaved ? (
-    <RemoveIcon className={cx.saveIcon} onClick={() => setIsSaved(false)} />
+    <RemoveIcon
+      style={{ cursor: 'pointer' }}
+      className={cx.saveIcon}
+      onClick={handleUnsavePost}
+    />
   ) : (
-    <SaveIcon className={cx.saveIcon} onClick={() => setIsSaved(true)} />
+    <SaveIcon
+      style={{ cursor: 'pointer' }}
+      className={cx.saveIcon}
+      onClick={handleSavePost}
+    />
   );
 };
 
-const CommentInput = () => {
+const CommentInput = ({ postId, profileId }) => {
   const cx = usePostStyles();
+  const { currentUser } = useContext(UserContext);
   const [content, setContent] = useState('');
+  const [createComment] = useMutation(CREATE_COMMENT);
+
+  const handleCreateComment = () => {
+    const variables = {
+      postId,
+      userId: currentUser.id,
+      content,
+      profileId,
+    };
+
+    createComment({ variables });
+    setContent('');
+  };
 
   return (
     <div className={cx.commentContainer}>
@@ -157,6 +320,7 @@ const CommentInput = () => {
         className={cx.commentButton}
         color="primary"
         disabled={!content.trim()}
+        onClick={handleCreateComment}
       >
         Post
       </Button>

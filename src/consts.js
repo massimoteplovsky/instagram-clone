@@ -8,3 +8,8 @@ export const Path = {
   SIGNUP: '/accounts/signup',
   DEFAULT: '*',
 };
+
+export const RouteProtection = {
+  PROTECTED: 'protected',
+  SEMI_PROTECTED: 'semi-protected',
+};

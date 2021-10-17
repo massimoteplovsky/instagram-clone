@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
-import { Path } from './consts';
-import { AuthContext } from './auth';
+import { Path, RouteProtection } from './consts';
+import { AuthContext, UserContext } from './context';
+import { useSubscription } from '@apollo/react-hooks';
+import { GET_CURRENT_USER } from './graphql/subscriptions';
 
 // Pages
 import FeedPage from './pages/feed';
@@ -15,6 +17,8 @@ import NotFoundPage from './pages/not-found';
 
 // Components
 import PostModal from './components/post/PostModal';
+import ProtectedRoute from './components/shared/ProtectedRoute';
+import LoadingScreen from './components/shared/LoadingScreen';
 
 const App = () => {
   const history = useHistory();
@@ -22,6 +26,9 @@ const App = () => {
   const prevLocation = useRef(history.location);
   const modal = history.location.state?.modal;
   const isAuth = authState.status === 'in';
+  const userId = isAuth ? authState.user.uid : null;
+  const variables = { userId };
+  const { data, loading } = useSubscription(GET_CURRENT_USER, { variables });
 
   useEffect(() => {
     if (history.action !== 'POP' && !modal) {
@@ -29,22 +36,89 @@ const App = () => {
     }
   }, [modal, history.location, history.action]);
 
+  if (loading) return <LoadingScreen />;
+
   const isModalOpen = modal && prevLocation.current !== history.location;
+  const currentUser = isAuth && data ? data.users[0] : null;
+
+  console.log(currentUser);
 
   return (
-    <>
+    <UserContext.Provider value={{ currentUser }}>
       <Switch location={isModalOpen ? prevLocation.current : history.location}>
-        <Route exact path={Path.DASHBOARD} component={FeedPage} />
-        <Route path={Path.EXPLORE} component={ExplorePage} />
-        <Route exact path={Path.ACCOUNT()} component={ProfilePage} />
-        <Route exact path={Path.POST()} component={PostPage} />
-        <Route path={Path.EDIT} component={EditProfilePage} />
-        <Route path={Path.LOGIN} component={LoginPage} />
-        <Route path={Path.SIGNUP} component={SignUpPage} />
+        <ProtectedRoute
+          path={Path.DASHBOARD}
+          exact
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <FeedPage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          path={Path.EXPLORE}
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <ExplorePage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          exact
+          path={Path.ACCOUNT()}
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <ProfilePage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          exact
+          path={Path.POST()}
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <PostPage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          exact
+          path={Path.EDIT}
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <EditProfilePage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          path={Path.LOGIN}
+          isAuth={isAuth}
+          protectionType={RouteProtection.SEMI_PROTECTED}
+        >
+          <LoginPage />
+        </ProtectedRoute>
+
+        <ProtectedRoute
+          path={Path.SIGNUP}
+          isAuth={isAuth}
+          protectionType={RouteProtection.SEMI_PROTECTED}
+        >
+          <SignUpPage />
+        </ProtectedRoute>
+
         <Route path={Path.DEFAULT} component={NotFoundPage} />
       </Switch>
-      {isModalOpen && <Route exact path={Path.POST()} component={PostModal} />}
-    </>
+      {isModalOpen && (
+        <ProtectedRoute
+          exact
+          path={Path.POST()}
+          isAuth={isAuth}
+          protectionType={RouteProtection.PROTECTED}
+        >
+          <PostModal />
+        </ProtectedRoute>
+      )}
+    </UserContext.Provider>
   );
 };
 

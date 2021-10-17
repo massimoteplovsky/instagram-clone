@@ -5,9 +5,9 @@ import 'firebase/database';
 import React, { useState, useEffect } from 'react';
 import { CREATE_USER } from './graphql/mutations';
 import defaultImage from './images/default-user-image.jpg';
+import { AuthContext } from './context';
 
-const provider = new firebase.auth.GoogleAuthProvider();
-export const AuthContext = React.createContext();
+const provider = new firebase.auth.FacebookAuthProvider();
 
 // Find these options in your Firebase console
 firebase.initializeApp({
@@ -53,14 +53,23 @@ const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  const signInWithGoogle = async () => {
-    await firebase.auth().signInWithPopup(provider);
+  const signInWithFacebook = async () => {
+    const data = await firebase.auth().signInWithPopup(provider);
+    console.log(data, 'data');
   };
 
   const signOut = async () => {
     setAuthState({ status: 'loading' });
     await firebase.auth().signOut();
     setAuthState({ status: 'out' });
+  };
+
+  const loginWithEmailAndPassword = async (email, password) => {
+    const userData = await firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password);
+
+    return userData;
   };
 
   const signUpWithEmailAndPassword = async ({
@@ -88,15 +97,21 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateEmail = async (email) => {
+    await authState.user.updateEmail(email);
+  };
+
   if (authState.status === 'loading') return null;
 
   return (
     <AuthContext.Provider
       value={{
         authState,
-        signInWithGoogle,
+        signInWithFacebook,
         signUpWithEmailAndPassword,
         signOut,
+        loginWithEmailAndPassword,
+        updateEmail,
       }}
     >
       {children}

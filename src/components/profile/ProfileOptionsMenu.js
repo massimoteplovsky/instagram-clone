@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useProfilePageStyles } from '../../styles';
-import { AuthContext } from '../../auth';
+import { AuthContext } from '../../context';
 import { Path } from '../../consts';
 
 const ProfileOptionsMenu = ({ handleCloseMenu }) => {
