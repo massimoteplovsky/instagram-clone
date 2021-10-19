@@ -20,6 +20,8 @@ const NotificationList = ({
   const cx = useNotificationListStyles();
   const listContainerRef = useRef();
 
+  console.log(notifications);
+
   useOutsideClick(listContainerRef, handleHideList);
   const [checkNotifications] = useMutation(CHECK_NOTIFICATIONS);
 
@@ -45,14 +47,14 @@ const NotificationList = ({
             <div className={cx.listItemWrapper}>
               <div className={cx.avatarWrapper}>
                 <Avatar
-                  src={notification.users.profile_image}
+                  src={notification.user.profile_image}
                   alt="User avatar"
                 />
               </div>
               <div className={cx.nameWrapper}>
-                <Link to={Path.ACCOUNT(notification.users.username)}>
+                <Link to={Path.ACCOUNT(notification.user.username)}>
                   <Typography variant="body1">
-                    {notification.users.username}
+                    {notification.user.username}
                   </Typography>
                 </Link>
                 <Typography
@@ -77,11 +79,11 @@ const NotificationList = ({
             </div>
             <div>
               {(isLike || isComment) && (
-                <Link to={Path.POST(notification.posts.id)}>
-                  <Avatar src={notification.posts.image} alt="post cover" />
+                <Link to={Path.POST(notification.post.id)}>
+                  <Avatar src={notification.post.image} alt="post cover" />
                 </Link>
               )}
-              {isFollow && <FollowButton userId={notifications.users.id} />}
+              {isFollow && <FollowButton userId={notification.user.id} />}
             </div>
           </Grid>
         );

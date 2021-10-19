@@ -20,14 +20,14 @@ const GridPost = ({ post }) => {
       <div className={cx.gridPostOverlay}>
         <div className={cx.gridPostInfo}>
           <span className={cx.likes}></span>
-          <Typography>{post.likes}</Typography>
+          <Typography>{post.likes_aggregate.aggregate.count}</Typography>
         </div>
         <div className={cx.gridPostInfo}>
           <span className={cx.comments}></span>
-          <Typography>{post.comments.length}</Typography>
+          <Typography>{post.comments_aggregate.aggregate.count}</Typography>
         </div>
       </div>
-      <img src={post.media} alt="Post cover" className={cx.image} />
+      <img src={post.image} alt="Post cover" className={cx.image} />
     </div>
   );
 };

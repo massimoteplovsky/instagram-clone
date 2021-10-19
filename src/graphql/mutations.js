@@ -176,3 +176,57 @@ export const CHECK_NOTIFICATIONS = gql`
     }
   }
 `;
+
+export const FOLLOW_PROFILE = gql`
+  mutation followProfile($userIdToFollow: uuid!, $currentUserId: uuid!) {
+    insert_following(
+      objects: { user_id: $currentUserId, profile_id: $userIdToFollow }
+    ) {
+      affected_rows
+    }
+    insert_followers(
+      objects: { user_id: $userIdToFollow, profile_id: $currentUserId }
+    ) {
+      affected_rows
+    }
+    insert_notifications(
+      objects: {
+        user_id: $currentUserId
+        profile_id: $userIdToFollow
+        type: "follow"
+      }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
+export const UNFOLLOW_PROFILE = gql`
+  mutation unfollowProfile($userIdToFollow: uuid!, $currentUserId: uuid!) {
+    delete_following(
+      where: {
+        profile_id: { _eq: $userIdToFollow }
+        user_id: { _eq: $currentUserId }
+      }
+    ) {
+      affected_rows
+    }
+    delete_followers(
+      where: {
+        profile_id: { _eq: $currentUserId }
+        user_id: { _eq: $userIdToFollow }
+      }
+    ) {
+      affected_rows
+    }
+    delete_notifications(
+      where: {
+        user_id: { _eq: $currentUserId }
+        profile_id: { _eq: $userIdToFollow }
+        type: { _eq: "follow" }
+      }
+    ) {
+      affected_rows
+    }
+  }
+`;

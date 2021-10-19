@@ -6,7 +6,7 @@ const ProtectedRoute = ({ isAuth, protectionType, children, ...rest }) => {
   return (
     <Route
       {...rest}
-      render={(history) => {
+      render={({ history }) => {
         if (isAuth && RouteProtection.SEMI_PROTECTED === protectionType) {
           return <Redirect to={Path.DASHBOARD} />;
         }

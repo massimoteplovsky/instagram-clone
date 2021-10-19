@@ -27,8 +27,10 @@ const App = () => {
   const modal = history.location.state?.modal;
   const isAuth = authState.status === 'in';
   const userId = isAuth ? authState.user.uid : null;
-  const variables = { userId };
-  const { data, loading } = useSubscription(GET_CURRENT_USER, { variables });
+  console.log(authState, 'App');
+  const { data, loading } = useSubscription(GET_CURRENT_USER, {
+    variables: { userId },
+  });
 
   useEffect(() => {
     if (history.action !== 'POP' && !modal) {
@@ -41,7 +43,7 @@ const App = () => {
   const isModalOpen = modal && prevLocation.current !== history.location;
   const currentUser = isAuth && data ? data.users[0] : null;
 
-  console.log(currentUser);
+  console.log(currentUser, 'App component');
 
   return (
     <UserContext.Provider value={{ currentUser }}>
