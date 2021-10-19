@@ -15,7 +15,6 @@ import {
   InputAdornment,
 } from '@material-ui/core';
 import { ArrowBackIos, PinDrop } from '@material-ui/icons';
-import { UserContext } from '../../context';
 import { serialize } from '../../utils/serialize';
 import { handleImageUpload } from '../../utils/imageUpload';
 import { CREATE_POST } from '../../graphql/mutations';

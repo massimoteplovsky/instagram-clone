@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApolloClient, useLazyQuery } from '@apollo/react-hooks';
+import { useLazyQuery } from '@apollo/react-hooks';
 import { Grid, Hidden, InputBase, Avatar, Typography } from '@material-ui/core';
 import { useNavbarStyles, WhiteTooltip } from '../../../styles';
 import { Path } from '../../../consts';

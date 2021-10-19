@@ -64,17 +64,17 @@ const ProfileTabs = ({ user, isOwner }) => {
           </Tabs>
         </Hidden>
         <Hidden smUp>{user.posts.length === 0 && <Divider />}</Hidden>
-        {value === 0 && <ProfilePosts user={user} isOwner={isOwner} />}
-        {value === 1 && <SavedPosts />}
+        {value === 0 && <ProfilePosts posts={user.posts} isOwner={isOwner} />}
+        {value === 1 && <SavedPosts posts={user.saved_posts} />}
       </section>
     </>
   );
 };
 
-const ProfilePosts = ({ user, isOwner }) => {
+const ProfilePosts = ({ posts, isOwner }) => {
   const cx = useProfileTabsStyles();
 
-  if (user.posts.length === 0) {
+  if (posts.length === 0) {
     return (
       <section className={cx.profilePostsSection}>
         <div className={cx.noContent}>
@@ -90,7 +90,7 @@ const ProfilePosts = ({ user, isOwner }) => {
   return (
     <article className={cx.article}>
       <div className={cx.postContainer}>
-        {user.posts.map((post) => (
+        {posts.map((post) => (
           <GridPost key={post.id} post={post} />
         ))}
       </div>
@@ -98,20 +98,32 @@ const ProfilePosts = ({ user, isOwner }) => {
   );
 };
 
-const SavedPosts = () => {
+const SavedPosts = ({ posts }) => {
   const cx = useProfileTabsStyles();
 
+  if (posts.length === 0) {
+    return (
+      <section className={cx.savedPostsSection}>
+        <div className={cx.noContent}>
+          <div className={cx.savePhotoIcon} />
+          <Typography variant="h4">Save</Typography>
+          <Typography align="center">
+            Save photos and videos that you want to see again. No one is
+            notified, and only you can see what you've saved.
+          </Typography>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className={cx.savedPostsSection}>
-      <div className={cx.noContent}>
-        <div className={cx.savePhotoIcon} />
-        <Typography variant="h4">Save</Typography>
-        <Typography align="center">
-          Save photos and videos that you want to see again. No one is notified,
-          and only you can see what you've saved.
-        </Typography>
+    <article className={cx.article}>
+      <div className={cx.postContainer}>
+        {posts.map(({ post }) => (
+          <GridPost key={post.id} post={post} />
+        ))}
       </div>
-    </section>
+    </article>
   );
 };
 

@@ -33,7 +33,7 @@ const FollowSuggestionItem = ({ user }) => {
         >
           {name}
         </Typography>
-        <FollowButton />
+        <FollowButton userId={user.id} />
       </div>
     </div>
   );

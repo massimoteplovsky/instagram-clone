@@ -15,7 +15,7 @@ import {
   HomeIcon,
   HomeActiveIcon,
 } from '../../../icons';
-import { UserContext } from '../../../context';
+import { AuthContext, UserContext } from '../../../context';
 
 // Components
 import NotificationTooltip from '../../notification/NotificationTooltip';
@@ -26,6 +26,8 @@ const Links = ({ path }) => {
   const cx = useNavbarStyles();
   const inputRef = useRef();
   const { currentUser } = useContext(UserContext);
+  // const { signOut } = useContext(AuthContext);
+  // signOut();
   const newNotifications = currentUser.notifications.filter(
     ({ created_at }) => {
       return isAfter(new Date(created_at), new Date(currentUser.last_checked));
@@ -76,7 +78,10 @@ const Links = ({ path }) => {
             ref={inputRef}
             onChange={handleAddPost}
           />
-          <AddIcon onClick={() => inputRef.current.click()} />
+          <AddIcon
+            style={{ cursor: 'pointer' }}
+            onClick={() => inputRef.current.click()}
+          />
         </Hidden>
         <Link to={Path.DASHBOARD}>
           {path === Path.DASHBOARD ? <HomeActiveIcon /> : <HomeIcon />}

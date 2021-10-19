@@ -34,28 +34,27 @@ const EditProfilePage = ({ history }) => {
   const path = history.location.pathname;
   const [showDrawer, setDrawer] = useState(false);
 
-  function handleToggleDrawer() {
+  const handleToggleDrawer = () => {
     setDrawer((prev) => !prev);
-  }
+  };
 
-  function handleSelected(index) {
+  const handleSelected = (index) => {
     switch (index) {
       case 0:
         return path.includes('edit');
       default:
         break;
     }
-  }
+  };
 
-  function handleListClick(index) {
+  const handleListClick = (index) => {
     switch (index) {
       case 0:
-        history.push(Path.EDIT);
-        break;
+        return history.push(Path.EDIT);
       default:
         break;
     }
-  }
+  };
 
   const options = [
     'Edit Profile',

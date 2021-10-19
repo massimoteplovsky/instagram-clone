@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Button,
@@ -11,17 +11,31 @@ import {
 } from '@material-ui/core';
 import { useProfilePageStyles } from '../../styles';
 import { Path } from '../../consts';
+import { useMutation } from '@apollo/react-hooks';
+import { FOLLOW_PROFILE, UNFOLLOW_PROFILE } from '../../graphql/mutations';
+import { UserContext } from '../../context';
+import { useFollowUnfollow } from '../../hooks/useFollowUnfollow';
 
 // Components
 import { GearIcon } from '../../icons';
 
-const ProfileNameSection = ({ user, isOwner, handleDialogOptions }) => {
+const ProfileNameSection = ({
+  user,
+  isOwner,
+  isFollowing,
+  isFollower,
+  handleDialogOptions,
+}) => {
   const cx = useProfilePageStyles();
+  const { currentUser } = useContext(UserContext);
   const [showUnfollowDialog, setUnfollowDialog] = useState(false);
+  const { handleFollowProfile, handleUnfollowProfile } = useFollowUnfollow(
+    user.id,
+    currentUser.id
+  );
 
   let followButton;
-  const isFollowing = true;
-  const isFollower = false;
+
   if (isFollowing) {
     followButton = (
       <Button
@@ -34,13 +48,23 @@ const ProfileNameSection = ({ user, isOwner, handleDialogOptions }) => {
     );
   } else if (isFollower) {
     followButton = (
-      <Button variant="contained" color="primary" className={cx.button}>
-        Follow Back
+      <Button
+        onClick={handleFollowProfile}
+        variant="contained"
+        color="primary"
+        className={cx.button}
+      >
+        Follow back
       </Button>
     );
   } else {
     followButton = (
-      <Button variant="contained" color="primary" className={cx.button}>
+      <Button
+        onClick={handleFollowProfile}
+        variant="contained"
+        color="primary"
+        className={cx.button}
+      >
         Follow
       </Button>
     );
@@ -87,14 +111,23 @@ const ProfileNameSection = ({ user, isOwner, handleDialogOptions }) => {
         </section>
       </Hidden>
       {showUnfollowDialog && (
-        <UnfollowDialog user={user} onClose={() => setUnfollowDialog(false)} />
+        <UnfollowDialog
+          user={user}
+          handleUnfollowProfile={handleUnfollowProfile}
+          onClose={() => setUnfollowDialog(false)}
+        />
       )}
     </>
   );
 };
 
-const UnfollowDialog = ({ onClose, user }) => {
+const UnfollowDialog = ({ onClose, handleUnfollowProfile, user }) => {
   const cx = useProfilePageStyles();
+
+  const onUnfollow = () => {
+    handleUnfollowProfile();
+    onClose();
+  };
 
   return (
     <Dialog
@@ -102,7 +135,7 @@ const UnfollowDialog = ({ onClose, user }) => {
       classes={{
         scrollPaper: cx.unfollowDialogScrollPaper,
       }}
-      onClose
+      onClose={onClose}
       TransitionComponent={Zoom}
     >
       <div className={cx.wrapper}>
@@ -120,7 +153,9 @@ const UnfollowDialog = ({ onClose, user }) => {
         Unfollow @{user.username}?
       </Typography>
       <Divider />
-      <Button className={cx.unfollowButton}>Unfollow</Button>
+      <Button className={cx.unfollowButton} onClick={onUnfollow}>
+        Unfollow
+      </Button>
       <Divider />
       <Button onClick={onClose} className={cx.cancelButton}>
         Cancel
